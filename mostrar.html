@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./public/lib/bootstrap-5.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <title>Gestión de Estudiantes - Escuela San Sebastián</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar-custom {
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .student-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .course-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .btn-edit {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit:hover {
+            transform: scale(1.05);
+        }
+        
+        .search-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #007bff, #28a745);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="inicio.html">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                Escuela San Sebastián
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="inicio.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="inscripcion.html">Inscripción</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="mostrar.html">Estudiantes</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px; padding-bottom: 50px;">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="text-white mb-3">
+                <i class="bi bi-people-fill me-3"></i>
+                Gestión de Estudiantes
+            </h1>
+            <p class="text-white-50 fs-5">Administra la información de todos los estudiantes por curso</p>
+        </div>
+
+        <!-- Barra de búsqueda y filtros -->
+        <div class="search-box">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="searchStudent" class="form-label fw-bold">Buscar Estudiante</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchStudent" placeholder="Nombre, apellido o ID...">
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filterCourse" class="form-label fw-bold">Filtrar por Curso</label>
+                    <select class="form-select" id="filterCourse">
+                        <option value="">Todos los cursos</option>
+                        <option value="preescolar">Preescolar</option>
+                        <option value="1ro">1° Primaria</option>
+                        <option value="2do">2° Primaria</option>
+                        <option value="3ro">3° Primaria</option>
+                        <option value="4to">4° Primaria</option>
+                        <option value="5to">5° Primaria</option>
+                        <option value="6to">6° Primaria</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label fw-bold">Estudiantes</label>
+                    <button class="btn btn-success w-100" onclick="addNewStudent()">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">Reportes</label>
+                    <div class="btn-group w-100">
+                        <button class="btn btn-info btn-sm" onclick="showReportOptions()" title="Generar Reportes">
+                            <i class="bi bi-file-earmark-text me-1"></i>Generar
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="showReportHistory()" title="Ver Historial">
+                            <i class="bi bi-clock-history"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" id="totalStudents">24</h4>
+                        <p class="mb-0">Total Estudiantes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-journals" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" id="totalCourses">7</h4>
+                        <p class="mb-0">Cursos Activos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark text-center">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2">3.4</h4>
+                        <p class="mb-0">Promedio por Curso</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white text-center">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-check" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2">98%</h4>
+                        <p class="mb-0">Asistencia</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de estudiantes por curso -->
+        <div id="studentsContainer">
+            <!-- Los cursos se generarán dinámicamente aquí -->
+        </div>
+    </div>
+
+    <!-- Modal para opciones de reportes -->
+    <div class="modal fade" id="reportOptionsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Generar Reportes
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <h6><i class="bi bi-download me-2"></i>Exportar Datos</h6>
+                            <div class="btn-group w-100" role="group">
+                                <button class="btn btn-outline-success" onclick="exportAllDataCSV()">
+                                    <i class="bi bi-filetype-csv me-2"></i>CSV
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="exportAllDataJSON()">
+                                    <i class="bi bi-filetype-json me-2"></i>JSON
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="generateCompletePDFReport()">
+                                    <i class="bi bi-filetype-pdf me-2"></i>PDF
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <h6><i class="bi bi-bar-chart me-2"></i>Reportes Especializados</h6>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-warning" onclick="generateCourseStatistics()">
+                                    <i class="bi bi-graph-up me-2"></i>Estadísticas por Curso
+                                </button>
+                                <button class="btn btn-outline-info" onclick="generateAttendanceReport()">
+                                    <i class="bi bi-calendar-check me-2"></i>Reporte de Asistencia
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="generateGradesReport()">
+                                    <i class="bi bi-award me-2"></i>Reporte de Calificaciones
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Información:</strong> Todos los reportes se guardarán en la carpeta <code>registros/</code> con la fecha actual como prefijo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para historial de reportes -->
+    <div class="modal fade" id="reportHistoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Historial de Reportes
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="reportHistoryContent">
+                        <!-- Se carga dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" onclick="clearReportHistory()">
+                        <i class="bi bi-trash me-2"></i>Limpiar Historial
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar estudiante -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Editar Información del Estudiante
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editNombres" class="form-label">Nombres</label>
+                                <input type="text" class="form-control" id="editNombres" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editApellidos" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="editApellidos" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="editFechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control" id="editFechaNacimiento" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editGrado" class="form-label">Grado</label>
+                                <select class="form-select" id="editGrado" required>
+                                    <option value="preescolar">Preescolar</option>
+                                    <option value="1ro">1° Primaria</option>
+                                    <option value="2do">2° Primaria</option>
+                                    <option value="3ro">3° Primaria</option>
+                                    <option value="4to">4° Primaria</option>
+                                    <option value="5to">5° Primaria</option>
+                                    <option value="6to">6° Primaria</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editEstado" class="form-label">Estado</label>
+                                <select class="form-select" id="editEstado" required>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="suspendido">Suspendido</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editTelefonoPadre" class="form-label">Teléfono del Padre</label>
+                                <input type="tel" class="form-control" id="editTelefonoPadre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmailPadre" class="form-label">Email del Padre</label>
+                                <input type="email" class="form-control" id="editEmailPadre" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDireccion" class="form-label">Dirección</label>
+                            <textarea class="form-control" id="editDireccion" rows="2" required></textarea>
+                        </div>
+                        <input type="hidden" id="editStudentId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStudentChanges()">
+                        <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./public/lib/bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./public/js/funciones.js"></script>
+    <script>
+        // Variables globales mejoradas
+        let studentsData = [];
+        let filteredData = [];
+        let currentSearchEngine;
+        
+        // Inicialización mejorada
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos del sistema
+            loadStudentsData();
+            
+            // Inicializar motor de búsqueda
+            currentSearchEngine = new SearchEngine(studentsData);
+            
+            // Configurar eventos
+            setupAdvancedEvents();
+            
+            // Renderizar estudiantes
+            renderStudents();
+            
+            // Mostrar estadísticas
+            updateStatistics();
+            
+            // Agregar funcionalidades extra
+            addAdvancedFeatures();
+        });
+        
+        // Cargar datos del sistema de gestión
+        function loadStudentsData() {
+            studentsData = dataManager.getData();
+            filteredData = [...studentsData];
+            
+            if (studentsData.length === 0) {
+                notificationSystem.info('No hay estudiantes registrados. Agrega el primero usando el formulario de inscripción.');
+            }
+        }
+        
+        // Configurar eventos avanzados
+        function setupAdvancedEvents() {
+            // Búsqueda avanzada con debounce
+            const searchInput = document.getElementById('searchStudent');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performAdvancedSearch();
+                }, 300);
+            });
+            
+            // Filtros
+            document.getElementById('filterCourse').addEventListener('change', performAdvancedSearch);
+            
+            // Atajos de teclado específicos
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'e') {
+                    e.preventDefault();
+                    exportAllData();
+                }
+                
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    generateReport();
+                }
+            });
+        }
+        
+        // Búsqueda avanzada mejorada
+        function performAdvancedSearch() {
+            const searchText = document.getElementById('searchStudent').value;
+            const courseFilter = document.getElementById('filterCourse').value;
+            
+            const searchOptions = {
+                text: searchText,
+                grade: courseFilter
+            };
+            
+            filteredData = currentSearchEngine.search(searchOptions);
+            renderStudents(filteredData);
+            updateStatistics(filteredData);
+            
+            // Resaltar términos de búsqueda
+            if (searchText) {
+                highlightSearchTerms(searchText);
+            }
+        }
+        
+        // Resaltar términos de búsqueda
+        function highlightSearchTerms(searchText) {
+            const studentCards = document.querySelectorAll('.student-card');
+            studentCards.forEach(card => {
+                const textNodes = card.querySelectorAll('h6, p');
+                textNodes.forEach(node => {
+                    if (node.textContent.toLowerCase().includes(searchText.toLowerCase())) {
+                        const regex = new RegExp(`(${searchText})`, 'gi');
+                        node.innerHTML = node.textContent.replace(regex, '<mark>$1</mark>');
+                    }
+                });
+            });
+        }
+        
+        // Renderizar estudiantes mejorado
+        function renderStudents(students = filteredData) {
+            const container = document.getElementById('studentsContainer');
+            
+            if (students.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-white">
+                        <i class="bi bi-search" style="font-size: 4rem; opacity: 0.5;"></i>
+                        <h3>No se encontraron estudiantes</h3>
+                        <p>Intenta con otros criterios de búsqueda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const courseGroups = {};
+            
+            // Agrupar estudiantes por curso
+            students.forEach(student => {
+                if (!courseGroups[student.grado]) {
+                    courseGroups[student.grado] = [];
+                }
+                courseGroups[student.grado].push(student);
+            });
+            
+            // Configuración de cursos
+            const courseNames = {
+                'preescolar': 'Preescolar',
+                '1ro': '1° Primaria',
+                '2do': '2° Primaria', 
+                '3ro': '3° Primaria',
+                '4to': '4° Primaria',
+                '5to': '5° Primaria',
+                '6to': '6° Primaria'
+            };
+            
+            const courseColors = {
+                'preescolar': 'primary',
+                '1ro': 'success',
+                '2do': 'info',
+                '3ro': 'warning',
+                '4to': 'danger',
+                '5to': 'secondary',
+                '6to': 'dark'
+            };
+            
+            // Generar HTML
+            let html = '';
+            Object.keys(courseGroups).forEach(course => {
+                const courseStudents = courseGroups[course];
+                const color = courseColors[course] || 'primary';
+                
+                html += `
+                    <div class="course-section" data-course="${course}">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="text-white mb-0">
+                                <span class="badge bg-${color} me-3 animate-pulse">${courseStudents.length}</span>
+                                ${courseNames[course]}
+                                <small class="text-white-50 ms-2">(Promedio: ${calculateCourseAverage(courseStudents).toFixed(1)})</small>
+                            </h3>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-light btn-sm" onclick="exportCourse('${course}')">
+                                    <i class="bi bi-download me-2"></i>Exportar
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="generateCourseReport('${course}')">
+                                    <i class="bi bi-file-text me-2"></i>Reporte
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                `;
+                
+                courseStudents.forEach(student => {
+                    const age = calculateAge(student.fechaNacimiento);
+                    const average = student.notas ? ReportGenerator.calculateAverage(student.notas) : 0;
+                    const statusBadge = student.estado === 'activo' ? 'success' : 
+                                       student.estado === 'inactivo' ? 'secondary' : 'danger';
+                    
+                    html += `
+                        <div class="col-md-6 col-lg-4 mb-3 student-item animate-bounce" data-student-id="${student.id}">
+                            <div class="student-card card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="student-avatar me-3">
+                                            ${generateAvatar(student.nombres, student.apellidos)}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">${student.nombres} ${student.apellidos}</h6>
+                                            <small class="text-muted">ID: ${student.id} | ${age} años | Promedio: ${average.toFixed(1)}</small>
+                                        </div>
+                                        <span class="badge bg-${statusBadge}">${student.estado}</span>
+                                    </div>
+                                    <div class="student-info">
+                                        <p class="mb-1"><i class="bi bi-telephone text-primary me-2"></i>${student.telefono}</p>
+                                        <p class="mb-1"><i class="bi bi-envelope text-primary me-2"></i>${student.email}</p>
+                                        <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>${student.direccion}</p>
+                                        ${student.observaciones ? `<p class="mb-2 text-muted"><i class="bi bi-chat-text me-2"></i>${student.observaciones}</p>` : ''}
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary btn-sm flex-fill btn-edit" onclick="editStudent(${student.id})">
+                                            <i class="bi bi-pencil me-1"></i>Editar
+                                        </button>
+                                        <button class="btn btn-info btn-sm" onclick="viewStudentDetails(${student.id})">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="deleteStudent(${student.id})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Aplicar animaciones
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.student-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        AnimationEffects.fadeIn(card, 300);
+                    }, index * 50);
+                });
+            }, 100);
+        }
+        
+        // Calcular promedio de curso
+        function calculateCourseAverage(students) {
+            const averages = students
+                .filter(s => s.notas)
+                .map(s => ReportGenerator.calculateAverage(s.notas));
+            
+            if (averages.length === 0) return 0;
+            return averages.reduce((sum, avg) => sum + avg, 0) / averages.length;
+        }
+        
+        // Ver detalles del estudiante
+        function viewStudentDetails(studentId) {
+            const student = studentsData.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const age = calculateAge(student.fechaNacimiento);
+            const average = student.notas ? ReportGenerator.calculateAverage(student.notas) : 0;
+            
+            // Crear modal de detalles
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title">
+                                <i class="bi bi-person-circle me-2"></i>
+                                Detalles del Estudiante
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <div class="student-avatar mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2rem;">
+                                        ${generateAvatar(student.nombres, student.apellidos)}
+                                    </div>
+                                    <h4>${student.nombres} ${student.apellidos}</h4>
+                                    <span class="badge bg-success fs-6">${student.estado}</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <strong>ID:</strong> ${student.id}
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong>Edad:</strong> ${age} años
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong>Grado:</strong> ${student.grado}
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong>Promedio:</strong> ${average.toFixed(1)}
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <strong>Teléfono:</strong> ${student.telefono}
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <strong>Email:</strong> ${student.email}
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <strong>Dirección:</strong> ${student.direccion}
+                                        </div>
+                                        ${student.observaciones ? `
+                                        <div class="col-12 mb-3">
+                                            <strong>Observaciones:</strong><br>
+                                            <em>${student.observaciones}</em>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ${student.notas ? `
+                            <hr>
+                            <h6>Calificaciones:</h6>
+                            <div class="row">
+                                <div class="col-3">Matemáticas: <span class="badge bg-primary">${student.notas.matematicas}</span></div>
+                                <div class="col-3">Español: <span class="badge bg-success">${student.notas.español}</span></div>
+                                <div class="col-3">Ciencias: <span class="badge bg-info">${student.notas.ciencias}</span></div>
+                                <div class="col-3">Inglés: <span class="badge bg-warning">${student.notas.ingles}</span></div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="editStudent(${student.id}); bootstrap.Modal.getInstance(this.closest('.modal')).hide();">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(modal);
+            });
+        }
+        
+        // Generar reporte de curso
+        function generateCourseReport(course) {
+            const courseStudents = studentsData.filter(s => s.grado === course);
+            ReportGenerator.generatePDFReport(courseStudents);
+            notificationSystem.success(`Reporte de ${course} generado correctamente`);
+        }
+        
+        // Exportar todos los datos
+        function exportAllData() {
+            const format = prompt('¿En qué formato deseas exportar? (csv/json)', 'csv');
+            if (format === 'csv') {
+                ReportGenerator.exportToCSV(studentsData, 'todos_los_estudiantes.csv');
+            } else if (format === 'json') {
+                ReportGenerator.exportToJSON(studentsData, 'todos_los_estudiantes.json');
+            }
+            notificationSystem.success('Datos exportados correctamente');
+        }
+        
+        // Generar reporte general
+        function generateReport() {
+            ReportGenerator.generatePDFReport(studentsData);
+            notificationSystem.success('Reporte general generado correctamente');
+        }
+        
+        // Actualizar estadísticas
+        function updateStatistics(data = studentsData) {
+            const stats = ReportGenerator.generateStatistics(data);
+            
+            document.getElementById('totalStudents').textContent = stats.total;
+            
+            // Actualizar otras estadísticas
+            const activeStudents = data.filter(s => s.estado === 'activo').length;
+            const coursesWithStudents = new Set(data.map(s => s.grado)).size;
+            
+            // Actualizar elementos si existen
+            const activeElement = document.querySelector('[data-stat="active"]');
+            if (activeElement) activeElement.textContent = activeStudents;
+            
+            const coursesElement = document.querySelector('[data-stat="courses"]');
+            if (coursesElement) coursesElement.textContent = coursesWithStudents;
+        }
+        
+        // Agregar funcionalidades avanzadas
+        function addAdvancedFeatures() {
+            // Agregar botón de backup
+            const searchBox = document.querySelector('.search-box .row');
+            if (searchBox) {
+                const backupButton = document.createElement('div');
+                backupButton.className = 'col-md-2 mb-3';
+                backupButton.innerHTML = `
+                    <label class="form-label fw-bold">Backup</label>
+                    <div class="btn-group w-100">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="createBackup()" title="Crear Backup">
+                            <i class="bi bi-cloud-upload"></i>
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="restoreBackup()" title="Restaurar Backup">
+                            <i class="bi bi-cloud-download"></i>
+                        </button>
+                    </div>
+                `;
+                searchBox.appendChild(backupButton);
+            }
+            
+            // Mostrar atajos de teclado
+            setTimeout(() => {
+                notificationSystem.info('💡 Atajos: Ctrl+E (Exportar), Ctrl+R (Reporte), Ctrl+F (Buscar)', 4000);
+            }, 3000);
+        }
+        
+        // Crear backup
+        function createBackup() {
+            if (dataManager.createBackup(studentsData)) {
+                notificationSystem.success('Backup creado correctamente');
+            } else {
+                notificationSystem.error('Error al crear backup');
+            }
+        }
+        
+        // Restaurar backup
+        function restoreBackup() {
+            if (confirm('¿Estás seguro de que quieres restaurar el backup? Esto sobrescribirá los datos actuales.')) {
+                if (dataManager.restoreBackup()) {
+                    loadStudentsData();
+                    renderStudents();
+                    updateStatistics();
+                    notificationSystem.success('Backup restaurado correctamente');
+                } else {
+                    notificationSystem.error('No se encontró backup para restaurar');
+                }
+            }
+        }
+        
+        // Funciones existentes mejoradas
+        function editStudent(studentId) {
+            const student = studentsData.find(s => s.id === studentId);
+            if (!student) return;
+
+            // Llenar el formulario con los datos del estudiante
+            document.getElementById('editNombres').value = student.nombres;
+            document.getElementById('editApellidos').value = student.apellidos;
+            document.getElementById('editFechaNacimiento').value = student.fechaNacimiento;
+            document.getElementById('editGrado').value = student.grado;
+            document.getElementById('editEstado').value = student.estado;
+            document.getElementById('editTelefonoPadre').value = student.telefono;
+            document.getElementById('editEmailPadre').value = student.email;
+            document.getElementById('editDireccion').value = student.direccion;
+            document.getElementById('editStudentId').value = student.id;
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+            modal.show();
+        }
+
+        function saveStudentChanges() {
+            const studentId = parseInt(document.getElementById('editStudentId').value);
+            const studentIndex = studentsData.findIndex(s => s.id === studentId);
+            
+            if (studentIndex === -1) return;
+
+            // Actualizar datos
+            studentsData[studentIndex] = {
+                ...studentsData[studentIndex],
+                nombres: ValidationUtils.sanitizeInput(document.getElementById('editNombres').value),
+                apellidos: ValidationUtils.sanitizeInput(document.getElementById('editApellidos').value),
+                fechaNacimiento: document.getElementById('editFechaNacimiento').value,
+                grado: document.getElementById('editGrado').value,
+                estado: document.getElementById('editEstado').value,
+                telefono: document.getElementById('editTelefonoPadre').value,
+                email: document.getElementById('editEmailPadre').value,
+                direccion: ValidationUtils.sanitizeInput(document.getElementById('editDireccion').value)
+            };
+
+            // Guardar en el sistema
+            dataManager.saveData(studentsData);
+
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editStudentModal'));
+            modal.hide();
+            
+            // Mostrar mensaje de éxito con animación
+            notificationSystem.success('Estudiante actualizado exitosamente 🎉');
+            
+            // Re-renderizar
+            loadStudentsData();
+            renderStudents();
+            updateStatistics();
+        }
+
+        function deleteStudent(studentId) {
+            const student = studentsData.find(s => s.id === studentId);
+            if (!student) return;
+            
+            if (confirm(`¿Estás seguro de que deseas eliminar a ${student.nombres} ${student.apellidos}?`)) {
+                studentsData = studentsData.filter(s => s.id !== studentId);
+                dataManager.saveData(studentsData);
+                
+                notificationSystem.warning('Estudiante eliminado correctamente');
+                
+                loadStudentsData();
+                renderStudents();
+                updateStatistics();
+            }
+        }
+
+        function addNewStudent() {
+            window.location.href = 'inscripcion.html';
+        }
+
+        function exportCourse(course) {
+            const courseStudents = studentsData.filter(s => s.grado === course);
+            ReportGenerator.exportToCSV(courseStudents, `estudiantes_${course}.csv`);
+            notificationSystem.success(`Curso ${course} exportado correctamente`);
+        }
+
+        // Funciones de utilidad
+        function generateAvatar(nombres, apellidos) {
+            const initials = nombres.charAt(0) + apellidos.charAt(0);
+            return initials.toUpperCase();
+        }
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+    </script>
+</body>
+</html>

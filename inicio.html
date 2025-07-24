@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./public/lib/bootstrap-5.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <title>San Sebastian </title>
+    <style>
+        /* Estilos para el carrusel 3D */
+        .carousel-3d {
+            perspective: 1200px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carousel-3d-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate3d 20s infinite linear;
+        }
+        
+        .carousel-3d-item {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            margin-left: -150px;
+            margin-top: -100px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.5s ease;
+        }
+        
+        .carousel-3d-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes rotate3d {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        
+        /* Gradiente de fondo */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Efectos de hover para las tarjetas */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        
+        /* Navbar transparente */
+        .navbar-custom {
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                Escuela San Sebastián
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#inicio">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#mision">Misión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#galeria">Galería</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="mostrar.html">
+                            <i class="bi bi-people me-1"></i>
+                            Estudiantes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="inscripcion.html">
+                            <i class="bi bi-pencil-square me-1"></i>
+                            Inscripción
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 100px;" id="inicio">
+        <h1 class="text-center text-white mb-4">Bienvenido a la Escuela San Sebastián</h1>
+        <p class="text-center text-white-50 fs-5 mb-5">Formando líderes del mañana con excelencia académica y valores sólidos</p>
+        
+        <!-- Carrusel 3D de fotografías -->
+        <div id="galeria" class="carousel-3d mb-5">
+            <div class="carousel-3d-inner">
+                <div class="carousel-3d-item" style="transform: rotateY(0deg) translateZ(400px);">
+                    <img src="./public/img/escuela.png" alt="Fachada de la Escuela">
+                </div>
+                <div class="carousel-3d-item" style="transform: rotateY(60deg) translateZ(400px);">
+                    <img src="./public/img/aulas.jpg" alt="Aulas Modernas">
+                </div>
+                <div class="carousel-3d-item" style="transform: rotateY(120deg) translateZ(400px);">
+                    <img src="./public/img/laboratorio.jpg" alt="Laboratorio de Ciencias">
+                </div>
+                <div class="carousel-3d-item" style="transform: rotateY(180deg) translateZ(400px);">
+                    <img src="./public/img/biblioteca.jpg" alt="Biblioteca">
+                </div>
+                <div class="carousel-3d-item" style="transform: rotateY(240deg) translateZ(400px);">
+                    <img src="./public/img/patio.jpg" alt="Patio de Recreo">
+                </div>
+                <div class="carousel-3d-item" style="transform: rotateY(300deg) translateZ(400px);">
+                    <img src="./public/img/estudiantes.jpg" alt="Estudiantes en Clase">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Misión y Visión -->
+        <div id="mision" class="row mt-5">
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark text-white h-100 border-primary">
+                    <div class="card-header bg-primary text-center">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-bullseye"></i> Misión
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Formar estudiantes íntegros con excelencia académica, valores cristianos y compromiso social, 
+                            brindando una educación de calidad que desarrolle sus competencias intelectuales, emocionales 
+                            y espirituales para que contribuyan positivamente a la sociedad.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card bg-dark text-white h-100 border-success">
+                    <div class="card-header bg-success text-center">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-eye"></i> Visión
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Ser reconocidos como una institución educativa líder en la formación integral de personas, 
+                            caracterizada por la innovación pedagógica, la excelencia académica y el fortalecimiento 
+                            de valores humanos y cristianos que transformen positivamente nuestra comunidad.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Valores -->
+        <div class="row mt-4 mb-5">
+            <div class="col-12">
+                <div class="card bg-dark text-white border-warning">
+                    <div class="card-header bg-warning text-dark text-center">
+                        <h3 class="card-title mb-0">
+                            <i class="bi bi-heart-fill"></i> Nuestros Valores
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="mb-3">
+                                    <i class="bi bi-hand-thumbs-up-fill text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="text-primary">Respeto</h5>
+                                <p>Valoramos la dignidad de cada persona y promovemos un ambiente de tolerancia</p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="mb-3">
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="text-success">Responsabilidad</h5>
+                                <p>Compromiso con el aprendizaje, la comunidad y el desarrollo personal</p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="mb-3">
+                                    <i class="bi bi-people-fill text-warning" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="text-warning">Solidaridad</h5>
+                                <p>Apoyo mutuo, servicio a los demás y construcción de comunidad</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Información Adicional -->
+        <div class="row mt-5 mb-5">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-award-fill text-info" style="font-size: 3rem;"></i>
+                        <h4 class="card-title mt-3 text-info">Excelencia Académica</h4>
+                        <p class="card-text">Programas educativos de alta calidad con metodologías innovadoras</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill text-info" style="font-size: 3rem;"></i>
+                        <h4 class="card-title mt-3 text-info">Comunidad Educativa</h4>
+                        <p class="card-text">Ambiente familiar que fomenta el crecimiento integral de cada estudiante</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card bg-dark text-white h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-laptop-fill text-info" style="font-size: 3rem;"></i>
+                        <h4 class="card-title mt-3 text-info">Tecnología Moderna</h4>
+                        <p class="card-text">Aulas equipadas con la última tecnología para el aprendizaje del siglo XXI</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-mortarboard-fill me-2"></i>Escuela San Sebastián</h5>
+                    <p class="mb-0">Formando líderes del mañana</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <i class="bi bi-telephone-fill me-2"></i>(123) 456-7890
+                        <br>
+                        <i class="bi bi-envelope-fill me-2"></i>info@sansebastian.edu
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./public/lib/bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./public/js/funciones.js"></script>
+    <script>
+        // Inicializar efectos especiales para la página principal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar efectos hover mejorados a las tarjetas
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    AnimationEffects.bounceEffect(this);
+                });
+            });
+            
+            // Agregar selector de tema
+            addThemeSelector();
+            
+            // Mostrar mensaje de bienvenida personalizado
+            setTimeout(() => {
+                notificationSystem.info('¡Bienvenido a la Escuela San Sebastián! 🎓', 3000);
+            }, 2000);
+        });
+        
+        // Agregar selector de tema a la página
+        function addThemeSelector() {
+            const navbar = document.querySelector('.navbar-nav');
+            if (navbar) {
+                const themeSelector = document.createElement('li');
+                themeSelector.className = 'nav-item dropdown';
+                themeSelector.innerHTML = `
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-palette me-1"></i>Tema
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="changeTheme('default')">Predeterminado</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeTheme('dark')">Oscuro</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeTheme('nature')">Naturaleza</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeTheme('sunset')">Atardecer</a></li>
+                    </ul>
+                `;
+                navbar.insertBefore(themeSelector, navbar.lastElementChild);
+            }
+        }
+        
+        // Cambiar tema
+        function changeTheme(theme) {
+            themeManager.applyTheme(theme);
+            notificationSystem.success(`Tema "${theme}" aplicado correctamente`);
+        }
+    </script>
+</body>
+</html>
