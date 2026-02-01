@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Facturación Electrónica</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --azul-oscuro: #003366;
+            --azul-claro: #e8f4fc;
+            --rojo: #dc3545;
+            --verde: #28a745;
+            --gris-claro: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container-main { max-width: 1200px; margin: 0 auto; }
+
+        .header-title { text-align: center; color: white; margin-bottom: 30px; }
+        .header-title h1 { font-size: 2.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+        .card-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: var(--azul-oscuro);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card-body-custom { padding: 20px; }
+
+        .factura-preview { border: 2px solid var(--azul-oscuro); background: white; font-size: 12px; }
+        .factura-header { display: flex; border-bottom: 2px solid var(--azul-oscuro); }
+        .factura-logo { width: 45%; padding: 15px; border-right: 2px solid var(--azul-oscuro); }
+
+        .logo-circle {
+            width: 100px; height: 100px;
+            border: 3px solid var(--azul-oscuro);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--azul-oscuro);
+            font-size: 11px;
+            line-height: 1.2;
+        }
+
+        .emisor-box { border: 1px solid var(--azul-oscuro); padding: 10px; font-size: 11px; }
+        .emisor-box .nombre-propietario { font-weight: bold; color: var(--azul-oscuro); font-size: 12px; }
+
+        .factura-datos { width: 55%; padding: 15px; }
+        .factura-titulo { text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 8px; margin: 10px 0; }
+        .numero-factura { color: var(--rojo); font-weight: bold; }
+
+        .codigo-barras { background: #f0f0f0; padding: 10px; text-align: center; margin: 10px 0; font-family: monospace; font-size: 10px; }
+        .barcode-lines { display: flex; justify-content: center; gap: 1px; margin-bottom: 5px; }
+        .barcode-lines span { display: inline-block; width: 2px; height: 40px; background: black; }
+        .barcode-lines span:nth-child(odd) { width: 1px; }
+        .barcode-lines span:nth-child(3n) { width: 3px; }
+
+        .cliente-table { width: 100%; border-collapse: collapse; border: 1px solid var(--azul-oscuro); }
+        .cliente-table td { padding: 8px 10px; border: 1px solid var(--azul-oscuro); font-size: 11px; }
+        .cliente-table .label { font-weight: bold; background: var(--azul-claro); width: 20%; }
+
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .items-table th { background: var(--azul-oscuro); color: white; padding: 10px; font-size: 11px; text-align: center; border: 1px solid var(--azul-oscuro); }
+        .items-table td { padding: 8px; border: 1px solid #dee2e6; font-size: 11px; }
+        .items-table .text-center { text-align: center; }
+        .items-table .text-right { text-align: right; }
+
+        .seccion-inferior { display: flex; margin-top: 15px; gap: 15px; }
+        .info-adicional { flex: 1; }
+        .totales-section { width: 45%; }
+
+        .info-table, .totales-table, .pago-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .info-table th, .pago-table th { background: var(--azul-oscuro); color: white; padding: 8px; text-align: left; }
+        .info-table td, .pago-table td { padding: 6px 8px; border: 1px solid #dee2e6; }
+
+        .totales-table td { padding: 6px 10px; border: 1px solid var(--azul-oscuro); }
+        .totales-table .label { font-weight: bold; background: var(--azul-claro); }
+        .totales-table .valor { text-align: right; width: 80px; }
+        .totales-table .total-final { background: var(--azul-oscuro); color: white; font-weight: bold; }
+
+        .form-label { font-weight: 500; color: #333; margin-bottom: 5px; }
+        .form-control { border: 2px solid #e0e0e0; border-radius: 8px; padding: 10px 15px; transition: all 0.3s; }
+        .form-control:focus { border-color: var(--azul-oscuro); box-shadow: 0 0 0 0.2rem rgba(0, 51, 102, 0.15); }
+        
+        .form-control.is-valid { border-color: var(--verde); background-image: none; }
+        .form-control.is-invalid { border-color: var(--rojo); background-image: none; }
+
+        .validation-message {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+        .validation-message.success { color: var(--verde); }
+        .validation-message.error { color: var(--rojo); }
+
+        .btn-primary-custom { background: var(--azul-oscuro); border: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; transition: all 0.3s; }
+        .btn-primary-custom:hover { background: #004080; transform: translateY(-2px); }
+
+        .btn-success-custom { background: #28a745; border: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; }
+        .btn-danger-custom { background: var(--rojo); border: none; padding: 8px 15px; border-radius: 5px; }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: 700; border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+        .btn-pdf:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5); }
+
+        .btn-nueva { background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: 700; border-radius: 10px; }
+
+        .delete-btn { color: white; background: var(--rojo); border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
+
+        .alert-custom {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 992px) {
+            .factura-header { flex-direction: column; }
+            .factura-logo, .factura-datos { width: 100%; border-right: none; border-bottom: 2px solid var(--azul-oscuro); }
+            .seccion-inferior { flex-direction: column; }
+            .totales-section { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <div class="header-title">
+            <h1><i class="fas fa-file-invoice-dollar me-3"></i>Sistema de Facturación Electrónica</h1>
+            <p class="mt-2">Genera facturas electrónicas con formato SRI Ecuador</p>
+        </div>
+
+        <div class="row">
+            <!-- COLUMNA IZQUIERDA - Formularios -->
+            <div class="col-lg-5">
+                <!-- Datos del Cliente -->
+                <div class="card-section">
+                    <div class="card-header-custom"><i class="fas fa-user me-2"></i>Datos del Cliente</div>
+                    <div class="card-body-custom">
+                        <!-- Mensajes de error/éxito -->
+                        <div th:if="${error}" class="alert-custom alert-error">
+                            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+                        </div>
+                        <div th:if="${exito}" class="alert-custom alert-success">
+                            <i class="fas fa-check-circle me-2"></i><span th:text="${exito}"></span>
+                        </div>
+                        
+                        <form th:action="@{/guardarCliente}" method="post" id="formCliente">
+                            <div class="mb-3">
+                                <label class="form-label">Razón Social / Nombre <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="razonSocial" id="razonSocial"
+                                       th:value="${factura.razonSocialCliente}" 
+                                       placeholder="Nombre del cliente" 
+                                       minlength="3" required>
+                                <span id="razonSocialMsg" class="validation-message"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">RUC / Cédula <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="rucCliente" id="rucCliente"
+                                           th:value="${factura.rucCliente}" 
+                                           placeholder="0000000000 o 0000000000001" 
+                                           pattern="\d{10}|\d{13}"
+                                           maxlength="13" required>
+                                    <span id="rucClienteMsg" class="validation-message"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" name="telefono" id="telefono"
+                                           th:value="${factura.telefonoCliente}" 
+                                           placeholder="0999999999"
+                                           maxlength="15">
+                                    <span id="telefonoMsg" class="validation-message"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="direccionCliente" id="direccionCliente"
+                                       th:value="${factura.direccionCliente}" 
+                                       placeholder="Dirección del cliente" 
+                                       minlength="5" required>
+                                <span id="direccionClienteMsg" class="validation-message"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control" name="correo" id="correo"
+                                       th:value="${factura.correoCliente}" 
+                                       placeholder="correo@ejemplo.com">
+                                <span id="correoMsg" class="validation-message"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom text-white w-100" id="btnGuardarCliente">
+                                <i class="fas fa-save me-2"></i>Guardar Cliente
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Agregar Productos -->
+                <div class="card-section">
+                    <div class="card-header-custom"><i class="fas fa-plus-circle me-2"></i>Agregar Producto/Servicio</div>
+                    <div class="card-body-custom">
+                        <!-- Mensajes de error/éxito para items -->
+                        <div th:if="${errorItem}" class="alert-custom alert-error">
+                            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorItem}"></span>
+                        </div>
+                        <div th:if="${exitoItem}" class="alert-custom alert-success">
+                            <i class="fas fa-check-circle me-2"></i><span th:text="${exitoItem}"></span>
+                        </div>
+                        
+                        <form th:action="@{/agregarItem}" method="post" id="formItem">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Código <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="codigo" id="codigo" placeholder="001" required>
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Descripción <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="descripcion" id="descripcion" 
+                                           placeholder="Producto o servicio" minlength="3" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Cantidad <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="cantidad" id="cantidad" 
+                                           min="1" value="1" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Precio Unit. <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="precioUnitario" id="precioUnitario" 
+                                           step="0.01" min="0.01" placeholder="0.00" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Descuento $</label>
+                                    <input type="number" class="form-control" name="descuento" id="descuento" 
+                                           step="0.01" min="0" value="0">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success-custom text-white w-100">
+                                <i class="fas fa-plus me-2"></i>Agregar Item
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="card-section">
+                    <div class="card-body-custom text-center">
+                        <a th:href="@{/generarPdf}" class="btn btn-pdf text-white me-2" 
+                           th:classappend="${#lists.isEmpty(factura.items) or factura.razonSocialCliente == null or factura.razonSocialCliente == ''} ? 'disabled' : ''"
+                           id="btnGenerarPdf">
+                            <i class="fas fa-file-pdf me-2"></i>Generar PDF
+                        </a>
+                        <form th:action="@{/nuevaFactura}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-nueva text-white">
+                                <i class="fas fa-plus me-2"></i>Nueva Factura
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA - Vista Previa de Factura -->
+            <div class="col-lg-7">
+                <div class="card-section">
+                    <div class="card-header-custom"><i class="fas fa-eye me-2"></i>Vista Previa de Factura</div>
+                    <div class="card-body-custom">
+                        <div class="factura-preview">
+                            <!-- Header de la factura -->
+                            <div class="factura-header">
+                                <div class="factura-logo">
+                                    <div class="logo-circle">PICANTERÍA<br>D'MARCELO</div>
+                                    <div class="emisor-box">
+                                        <p class="nombre-propietario" th:text="${factura.nombrePropietario}">ESCOBAR CAJAMARCA IVETH MARICELA</p>
+                                        <p th:text="${factura.nombreEmpresa}">PICANTERIA DON MARCELO</p>
+                                        <p><strong>DIRECCIÓN:</strong> <span th:text="${factura.direccionEmisor}"></span></p>
+                                        <p><strong>DIR. SUCURSAL:</strong> <span th:text="${factura.direccionSucursal}"></span></p>
+                                        <p><strong>OBLIGADO A LLEVAR CONTABILIDAD:</strong> <span th:text="${factura.obligadoContabilidad} ? 'SI' : 'NO'">NO</span></p>
+                                    </div>
+                                </div>
+                                <div class="factura-datos">
+                                    <p><strong>R.U.C.:</strong> <span th:text="${factura.rucEmisor}">0503815623001</span></p>
+                                    <p class="factura-titulo">F A C T U R A</p>
+                                    <p><strong>No:</strong> <span class="numero-factura" th:text="${factura.numeroFactura}">001-001-000000001</span></p>
+                                    <p><strong>NÚMERO DE AUTORIZACIÓN:</strong></p>
+                                    <p style="font-size: 9px; word-break: break-all;" th:text="${factura.numeroAutorizacion}"></p>
+                                    <p><strong>FECHA Y HORA DE AUTORIZACIÓN:</strong></p>
+                                    <p th:text="${factura.fechaAutorizacion}"></p>
+                                    <p><strong>AMBIENTE:</strong> <span th:text="${factura.ambiente}">PRODUCCION</span></p>
+                                    <p><strong>EMISION:</strong> <span th:text="${factura.tipoEmision}">NORMAL</span></p>
+                                    <p><strong>CLAVE DE ACCESO:</strong></p>
+                                    <div class="codigo-barras">
+                                        <div class="barcode-lines">
+                                            <span th:each="i : ${#numbers.sequence(1, 60)}"></span>
+                                        </div>
+                                        <small th:text="${factura.claveAcceso}"></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Datos del cliente -->
+                            <table class="cliente-table">
+                                <tr>
+                                    <td class="label">RAZON SOCIAL:</td>
+                                    <td th:text="${factura.razonSocialCliente} ?: 'Sin especificar'"></td>
+                                    <td class="label">FECHA DE EMISION:</td>
+                                    <td th:text="${factura.fechaEmision}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">RUC / CI:</td>
+                                    <td th:text="${factura.rucCliente} ?: 'Sin especificar'"></td>
+                                    <td class="label">GUIA DE REMISION:</td>
+                                    <td th:text="${factura.guiaRemision} ?: ''"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">DIRECCION:</td>
+                                    <td colspan="3" th:text="${factura.direccionCliente} ?: 'Sin especificar'"></td>
+                                </tr>
+                            </table>
+
+                            <!-- Tabla de items -->
+                            <table class="items-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%">No.</th>
+                                        <th style="width: 10%">CODIGO</th>
+                                        <th style="width: 40%">DESCRIPCION</th>
+                                        <th style="width: 10%">CANTIDAD</th>
+                                        <th style="width: 12%">PRECIO U.</th>
+                                        <th style="width: 8%">DESC.</th>
+                                        <th style="width: 12%">TOTAL</th>
+                                        <th style="width: 3%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item, iterStat : ${factura.items}">
+                                        <td class="text-center" th:text="${item.numero}">1</td>
+                                        <td class="text-center" th:text="${item.codigo}">12</td>
+                                        <td th:text="${item.descripcion}">PRODUCTO</td>
+                                        <td class="text-center" th:text="${item.cantidad}">1</td>
+                                        <td class="text-right" th:text="${#numbers.formatDecimal(item.precioUnitario, 1, 2)}">0.00</td>
+                                        <td class="text-center" th:text="${#numbers.formatDecimal(item.descuento, 1, 0)}">0</td>
+                                        <td class="text-right" th:text="${#numbers.formatDecimal(item.total, 1, 2)}">0.00</td>
+                                        <td>
+                                            <form th:action="@{/eliminarItem}" method="post" style="margin: 0;">
+                                                <input type="hidden" name="index" th:value="${iterStat.index}">
+                                                <button type="submit" class="delete-btn" title="Eliminar"><i class="fas fa-times"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(factura.items)}">
+                                        <td colspan="8" class="text-center" style="padding: 30px; color: #888;">
+                                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                                            <p>No hay productos agregados</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Sección inferior -->
+                            <div class="seccion-inferior" style="padding: 15px;">
+                                <div class="info-adicional">
+                                    <table class="info-table">
+                                        <thead><tr><th colspan="2">INFORMACIÓN ADICIONAL</th></tr></thead>
+                                        <tbody>
+                                            <tr><td><strong>CORREO:</strong></td><td th:text="${factura.correoCliente} ?: ''"></td></tr>
+                                            <tr><td><strong>TELÉFONO:</strong></td><td th:text="${factura.telefonoCliente} ?: ''"></td></tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="pago-table mt-3">
+                                        <thead><tr><th>COD</th><th>FORMA DE PAGO</th><th>VALOR</th><th>PLAZO</th></tr></thead>
+                                        <tbody>
+                                            <tr>
+                                                <td th:text="${factura.codigoFormaPago}">01</td>
+                                                <td th:text="${factura.formaPago}">SIN UTILIZACION DEL SISTEMA FINANCIERO</td>
+                                                <td th:text="${#numbers.formatDecimal(factura.valorTotal, 1, 2)}">0.00</td>
+                                                <td th:text="${factura.plazo}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="totales-section">
+                                    <table class="totales-table">
+                                        <tr><td class="label">SUBTOTAL 15%</td><td class="valor" th:text="${#numbers.formatDecimal(factura.subtotal15, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">SUBTOTAL 0%</td><td class="valor" th:text="${#numbers.formatDecimal(factura.subtotal0, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">SUBTOTAL NO OBJETO DE IVA</td><td class="valor" th:text="${#numbers.formatDecimal(factura.subtotalNoObjetoIva, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">SUBTOTAL EXENTO DE IVA</td><td class="valor" th:text="${#numbers.formatDecimal(factura.subtotalExentoIva, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">SUBTOTAL SIN IMPUESTOS</td><td class="valor" th:text="${#numbers.formatDecimal(factura.subtotalSinImpuestos, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">TOTAL DESCUENTO</td><td class="valor" th:text="${#numbers.formatDecimal(factura.totalDescuento, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">SERVICIO</td><td class="valor" th:text="${#numbers.formatDecimal(factura.servicio, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">ICE</td><td class="valor" th:text="${#numbers.formatDecimal(factura.ice, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label">IVA 15%</td><td class="valor" th:text="${#numbers.formatDecimal(factura.iva15, 1, 2)}">0.00</td></tr>
+                                        <tr><td class="label total-final">VALOR TOTAL</td><td class="valor total-final" th:text="${#numbers.formatDecimal(factura.valorTotal, 1, 2)}">0.00</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación de cédula ecuatoriana en el frontend
+        function validarCedulaEcuador(cedula) {
+            if (!cedula || cedula.length !== 10) return false;
+            if (!/^\d{10}$/.test(cedula)) return false;
+
+            const provincia = parseInt(cedula.substring(0, 2));
+            if (provincia < 1 || (provincia > 24 && provincia !== 30)) return false;
+
+            const tercerDigito = parseInt(cedula.charAt(2));
+            if (tercerDigito > 5) return false;
+
+            const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+            let suma = 0;
+
+            for (let i = 0; i < 9; i++) {
+                let resultado = parseInt(cedula.charAt(i)) * coeficientes[i];
+                if (resultado > 9) resultado -= 9;
+                suma += resultado;
+            }
+
+            const residuo = suma % 10;
+            const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
+            const ultimoDigito = parseInt(cedula.charAt(9));
+
+            return digitoVerificador === ultimoDigito;
+        }
+
+        // Validación de RUC (simplificada: primeros 10 dígitos = cédula + 001)
+        function validarRucEcuador(ruc) {
+            if (!ruc || ruc.length !== 13) return false;
+            if (!/^\d{13}$/.test(ruc)) return false;
+
+            const establecimiento = ruc.substring(10, 13);
+            if (parseInt(establecimiento) < 1) return false;
+
+            const tercerDigito = parseInt(ruc.charAt(2));
+            
+            // Persona natural
+            if (tercerDigito < 6) {
+                return validarCedulaEcuador(ruc.substring(0, 10));
+            }
+            
+            // Para sociedades, validación básica
+            return true;
+        }
+
+        // Validar teléfono ecuatoriano
+        function validarTelefono(telefono) {
+            if (!telefono || telefono.trim() === '') return true; // Campo opcional
+            telefono = telefono.replace(/[\s\-\(\)]/g, '');
+            
+            // Celular: 09XXXXXXXX
+            if (/^09\d{8}$/.test(telefono)) return true;
+            // Fijo: 0XXXXXXXX
+            if (/^0[2-7]\d{7}$/.test(telefono)) return true;
+            // Con código país
+            if (/^\+593\d{9,10}$/.test(telefono)) return true;
+            
+            return false;
+        }
+
+        // Validar correo
+        function validarCorreo(correo) {
+            if (!correo || correo.trim() === '') return true; // Campo opcional
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return regex.test(correo);
+        }
+
+        // Función para mostrar mensaje de validación
+        function mostrarMensaje(elementId, mensaje, esValido) {
+            const msgElement = document.getElementById(elementId + 'Msg');
+            const inputElement = document.getElementById(elementId);
+            
+            if (msgElement) {
+                msgElement.textContent = mensaje;
+                msgElement.className = 'validation-message ' + (esValido ? 'success' : 'error');
+            }
+            
+            if (inputElement) {
+                inputElement.classList.remove('is-valid', 'is-invalid');
+                if (mensaje) {
+                    inputElement.classList.add(esValido ? 'is-valid' : 'is-invalid');
+                }
+            }
+        }
+
+        // Evento para validar RUC/Cédula
+        document.getElementById('rucCliente').addEventListener('blur', function() {
+            const valor = this.value.trim();
+            
+            if (!valor) {
+                mostrarMensaje('rucCliente', '', false);
+                return;
+            }
+
+            if (!/^\d+$/.test(valor)) {
+                mostrarMensaje('rucCliente', 'Solo debe contener números', false);
+                return;
+            }
+
+            if (valor.length === 10) {
+                if (validarCedulaEcuador(valor)) {
+                    mostrarMensaje('rucCliente', 'Cédula válida ✓', true);
+                } else {
+                    mostrarMensaje('rucCliente', 'Cédula inválida - Verifique los dígitos', false);
+                }
+            } else if (valor.length === 13) {
+                if (validarRucEcuador(valor)) {
+                    mostrarMensaje('rucCliente', 'RUC válido ✓', true);
+                } else {
+                    mostrarMensaje('rucCliente', 'RUC inválido - Verifique los dígitos', false);
+                }
+            } else {
+                mostrarMensaje('rucCliente', 'Debe tener 10 dígitos (cédula) o 13 dígitos (RUC)', false);
+            }
+        });
+
+        // Evento para validar teléfono
+        document.getElementById('telefono').addEventListener('blur', function() {
+            const valor = this.value.trim();
+            
+            if (!valor) {
+                mostrarMensaje('telefono', '', true);
+                return;
+            }
+
+            if (validarTelefono(valor)) {
+                mostrarMensaje('telefono', 'Teléfono válido ✓', true);
+            } else {
+                mostrarMensaje('telefono', 'Formato inválido. Use: 09XXXXXXXX o 02XXXXXXX', false);
+            }
+        });
+
+        // Evento para validar correo
+        document.getElementById('correo').addEventListener('blur', function() {
+            const valor = this.value.trim();
+            
+            if (!valor) {
+                mostrarMensaje('correo', '', true);
+                return;
+            }
+
+            if (validarCorreo(valor)) {
+                mostrarMensaje('correo', 'Correo válido ✓', true);
+            } else {
+                mostrarMensaje('correo', 'Formato de correo inválido', false);
+            }
+        });
+
+        // Evento para validar razón social
+        document.getElementById('razonSocial').addEventListener('blur', function() {
+            const valor = this.value.trim();
+            
+            if (!valor) {
+                mostrarMensaje('razonSocial', 'Este campo es requerido', false);
+                return;
+            }
+
+            if (valor.length < 3) {
+                mostrarMensaje('razonSocial', 'Debe tener al menos 3 caracteres', false);
+            } else {
+                mostrarMensaje('razonSocial', '', true);
+            }
+        });
+
+        // Evento para validar dirección
+        document.getElementById('direccionCliente').addEventListener('blur', function() {
+            const valor = this.value.trim();
+            
+            if (!valor) {
+                mostrarMensaje('direccionCliente', 'Este campo es requerido', false);
+                return;
+            }
+
+            if (valor.length < 5) {
+                mostrarMensaje('direccionCliente', 'Debe tener al menos 5 caracteres', false);
+            } else {
+                mostrarMensaje('direccionCliente', '', true);
+            }
+        });
+
+        // Solo permitir números en el campo de RUC/Cédula
+        document.getElementById('rucCliente').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Solo permitir números en el campo de teléfono
+        document.getElementById('telefono').addEventListener('input', function() {
+            this.value = this.value.replace(/[^\d+\-\s\(\)]/g, '');
+        });
+
+        // Validación antes de enviar el formulario
+        document.getElementById('formCliente').addEventListener('submit', function(e) {
+            const ruc = document.getElementById('rucCliente').value.trim();
+            const razonSocial = document.getElementById('razonSocial').value.trim();
+            const direccion = document.getElementById('direccionCliente').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const correo = document.getElementById('correo').value.trim();
+
+            let esValido = true;
+
+            // Validar razón social
+            if (!razonSocial || razonSocial.length < 3) {
+                mostrarMensaje('razonSocial', 'La razón social debe tener al menos 3 caracteres', false);
+                esValido = false;
+            }
+
+            // Validar RUC/Cédula
+            if (ruc.length === 10) {
+                if (!validarCedulaEcuador(ruc)) {
+                    mostrarMensaje('rucCliente', 'La cédula ingresada no es válida', false);
+                    esValido = false;
+                }
+            } else if (ruc.length === 13) {
+                if (!validarRucEcuador(ruc)) {
+                    mostrarMensaje('rucCliente', 'El RUC ingresado no es válido', false);
+                    esValido = false;
+                }
+            } else {
+                mostrarMensaje('rucCliente', 'Debe tener 10 dígitos (cédula) o 13 dígitos (RUC)', false);
+                esValido = false;
+            }
+
+            // Validar dirección
+            if (!direccion || direccion.length < 5) {
+                mostrarMensaje('direccionCliente', 'La dirección debe tener al menos 5 caracteres', false);
+                esValido = false;
+            }
+
+            // Validar teléfono (opcional)
+            if (telefono && !validarTelefono(telefono)) {
+                mostrarMensaje('telefono', 'Formato de teléfono inválido', false);
+                esValido = false;
+            }
+
+            // Validar correo (opcional)
+            if (correo && !validarCorreo(correo)) {
+                mostrarMensaje('correo', 'Formato de correo inválido', false);
+                esValido = false;
+            }
+
+            if (!esValido) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

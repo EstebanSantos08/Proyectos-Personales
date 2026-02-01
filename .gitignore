@@ -1,0 +1,49 @@
+# Node.js
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# Coverage
+coverage/
+.nyc_output/
