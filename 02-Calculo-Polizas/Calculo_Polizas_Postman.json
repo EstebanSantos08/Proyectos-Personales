@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "calculo-polizas-api",
+		"name": "Calculo Polizas API",
+		"description": "Colección para probar la API de cálculo de pólizas de seguros",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET - Pruebas con Query Params",
+			"item": [
+				{
+					"name": "GET - Joven (18-24 años)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular?nombre=Esteban&edad=21&numeroAccidentes=0&valor=25000&modelo=A",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"],
+							"query": [
+								{"key": "nombre", "value": "Esteban"},
+								{"key": "edad", "value": "21"},
+								{"key": "numeroAccidentes", "value": "0"},
+								{"key": "valor", "value": "25000"},
+								{"key": "modelo", "value": "A"}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET - Adulto (25-53 años)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular?nombre=Maria Garcia&edad=35&numeroAccidentes=2&valor=75000&modelo=B",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"],
+							"query": [
+								{"key": "nombre", "value": "Maria Garcia"},
+								{"key": "edad", "value": "35"},
+								{"key": "numeroAccidentes", "value": "2"},
+								{"key": "valor", "value": "75000"},
+								{"key": "modelo", "value": "B"}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET - Mayor (>53 años)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular?nombre=Carlos Lopez&edad=55&numeroAccidentes=3&valor=100000&modelo=C",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"],
+							"query": [
+								{"key": "nombre", "value": "Carlos Lopez"},
+								{"key": "edad", "value": "55"},
+								{"key": "numeroAccidentes", "value": "3"},
+								{"key": "valor", "value": "100000"},
+								{"key": "modelo", "value": "C"}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET - Muchos Accidentes (>3)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular?nombre=Pedro Sanchez&edad=40&numeroAccidentes=5&valor=60000&modelo=A",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"],
+							"query": [
+								{"key": "nombre", "value": "Pedro Sanchez"},
+								{"key": "edad", "value": "40"},
+								{"key": "numeroAccidentes", "value": "5"},
+								{"key": "valor", "value": "60000"},
+								{"key": "modelo", "value": "A"}
+							]
+						}
+					}
+				},
+				{
+					"name": "GET - Menor de Edad (ERROR)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular?nombre=Menor Test&edad=17&numeroAccidentes=0&valor=30000&modelo=A",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"],
+							"query": [
+								{"key": "nombre", "value": "Menor Test"},
+								{"key": "edad", "value": "17"},
+								{"key": "numeroAccidentes", "value": "0"},
+								{"key": "valor", "value": "30000"},
+								{"key": "modelo", "value": "A"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "POST - Pruebas con JSON Body",
+			"item": [
+				{
+					"name": "POST - Joven (18-24 años)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Esteban\",\n    \"edad\": 21,\n    \"accidentes\": 0,\n    \"valor\": 25000,\n    \"modelo\": \"A\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"]
+						}
+					}
+				},
+				{
+					"name": "POST - Adulto (25-53 años)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Maria Garcia\",\n    \"edad\": 35,\n    \"accidentes\": 2,\n    \"valor\": 75000,\n    \"modelo\": \"B\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"]
+						}
+					}
+				},
+				{
+					"name": "POST - Mayor (>53 años)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Carlos Lopez\",\n    \"edad\": 55,\n    \"accidentes\": 3,\n    \"valor\": 100000,\n    \"modelo\": \"C\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"]
+						}
+					}
+				},
+				{
+					"name": "POST - Muchos Accidentes (>3)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Pedro Sanchez\",\n    \"edad\": 40,\n    \"accidentes\": 5,\n    \"valor\": 60000,\n    \"modelo\": \"A\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"]
+						}
+					}
+				},
+				{
+					"name": "POST - Menor de Edad (ERROR)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Menor Test\",\n    \"edad\": 17,\n    \"accidentes\": 0,\n    \"valor\": 30000,\n    \"modelo\": \"A\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/poliza/calcular",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8081",
+							"path": ["api", "poliza", "calcular"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
